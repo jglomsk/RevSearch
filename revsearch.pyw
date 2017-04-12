@@ -18,7 +18,7 @@ class Rev(object):
         m = subprocess.Popen("ls", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         k, y = m.communicate()
         self.insert_thing(k)
-        self.listbox_thing.bind("<Double-1>", self.open_it)
+        self.listbox_thing.bind("<Double-1>", self.open_it) # Double left click = open
         self.listbox_thing.bind("<Left>", self.go_up) # left goes back
         self.listbox_thing.bind("<Right>", self.open_it) # right opens
         self.listbox_thing.bind("<Control-n>", self.new_fi) # Control + n = new file
@@ -74,12 +74,12 @@ class Rev(object):
         self.searcher.focus_force()
 
     def move_anywhere(self, value=None):
-        self.topm = Toplevel(self.root)
-        new_m_lab = Label(self.topm, text="Path to original")
-        self.old_place = Entry(self.topm)
-        new_place_lab = Label(self.topm, text="New path")
-        self.new_place = Entry(self.topm)
-        confirm = Button(self.topm, text="Move", command=self.move_to)
+        self.top1 = Toplevel(self.root)
+        new_m_lab = Label(self.top1, text="Path to original")
+        self.old_place = Entry(self.top1)
+        new_place_lab = Label(self.top1, text="New path")
+        self.new_place = Entry(self.top1)
+        confirm = Button(self.top1, text="Move", command=self.move_to)
         self.new_place.bind("<Return>", self.move_to)
         new_m_lab.pack()
         self.old_place.pack()
@@ -111,8 +111,7 @@ class Rev(object):
         else:
             self.full = str(path.dirname(path.realpath(self.listbox_thing.get(ACTIVE)))) + "/" + \
                 str(self.listbox_thing.get(ACTIVE))
-        i = self.format_full(self.full)
-        o = subprocess.Popen("mv " + i + " " + self.new_name.get() + "; ls", \
+        o = subprocess.Popen("mv " + self.format_full(self.full) + " " + self.new_name.get() + "; ls", \
             shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         y, x = o.communicate()
         if x:
@@ -130,8 +129,6 @@ class Rev(object):
         i = self.format_full(self.full)
         for m in range(0, len(i)):
             if i[m] == ".":
-                if int(i[m - 1]) > self.v:
-                    self.v = int(i[m - 1] + 1)
                 t += str(self.v)
             t += i[m]
         o = subprocess.Popen("cp " + i + " " + t + "; ls", \
@@ -145,15 +142,15 @@ class Rev(object):
             " " + self.new_place.get() + "; ls", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         y, x = o.communicate()
         self.warn(x) if x else self.insert_thing(y)
-        self.topm.destroy()
+        self.top1.destroy()
 
     def copy_anywhere(self, value=None):
-        self.topm = Toplevel(self.root)
-        new_m_lab = Label(self.topm, text="Path to original")
-        self.old_place = Entry(self.topm)
-        new_place_lab = Label(self.topm, text="New path")
-        self.new_place = Entry(self.topm)
-        confirm = Button(self.topm, text="Copy", command=self.copy_to)
+        self.top3 = Toplevel(self.root)
+        new_m_lab = Label(self.top3, text="Path to original")
+        self.old_place = Entry(self.top3)
+        new_place_lab = Label(self.top3, text="New path")
+        self.new_place = Entry(self.top3)
+        confirm = Button(self.top3, text="Copy", command=self.copy_to)
         self.new_place.bind("<Return>", self.copy_to)
         new_m_lab.pack()
         self.old_place.pack()
@@ -170,15 +167,15 @@ class Rev(object):
                 " " + self.new_place.get() + "; ls", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         y, x = o.communicate()
         self.warn(x) if x else self.insert_thing(y)
-        self.topm.destroy()
+        self.top3.destroy()
 
     def recover_trash(self, value=None):
-        self.topt = Toplevel(self.root)
-        new_t_lab = Label(self.topt, text="Name of File")
-        self.new_t_name = Entry(self.topt)
-        go_to_lab = Label(self.topt, text="Move to")
-        self.go_to = Entry(self.topt)
-        confirm = Button(self.topt, text="Recover", command=self.move_from)
+        self.top4 = Toplevel(self.root)
+        new_t_lab = Label(self.top4, text="Name of File")
+        self.new_t_name = Entry(self.top4)
+        go_to_lab = Label(self.top4, text="Move to")
+        self.go_to = Entry(self.top4)
+        confirm = Button(self.top4, text="Recover", command=self.move_from)
         self.go_to.bind("<Return>", self.move_from)
         new_t_lab.pack()
         self.new_t_name.pack()
@@ -196,7 +193,7 @@ class Rev(object):
             " " + self.go_to.get() + "; ls", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         y, x = o.communicate()
         self.warn(x) if x else self.insert_thing(y)
-        self.topt.destroy()
+        self.top4.destroy()
 
     def show_contents(self, value=None):
         self.full = str(path.dirname(path.realpath(self.listbox_thing.get(ACTIVE)))) + "/" + \
@@ -209,8 +206,7 @@ class Rev(object):
             self.root.wm_title("RevSearch (" + str(path.dirname(path.realpath(self.listbox_thing.get(ACTIVE)))) + ")")
         else:
             self.full = self.listbox_thing.get(ACTIVE)
-            i = self.format_full(self.full)
-            system("open " + i)
+            system("open " + self.format_full(self.full))
 
     def delete_file(self, value=None):
         if str(path.dirname(path.realpath(self.listbox_thing.get(ACTIVE)))) == "/":
@@ -218,8 +214,8 @@ class Rev(object):
         else:
             self.full = str(path.dirname(path.realpath(self.listbox_thing.get(ACTIVE)))) + "/" + \
                 str(self.listbox_thing.get(ACTIVE))
-        i = self.format_full(self.full)
-        o = subprocess.Popen("mv " + i + " ~/Trash/ ; ls", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        o = subprocess.Popen("mv " + self.format_full(self.full) + " ~/Trash/ ; ls", shell=True, \
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         y, x = o.communicate()
         self.warn(x) if x else self.insert_thing(y)
 
@@ -230,9 +226,9 @@ class Rev(object):
         Rev(Tk())
 
     def new_fi(self, value=None):
-        self.topf = Toplevel(self.root)
-        self.new_f_name = Entry(self.topf)
-        confirm = Button(self.topf, text="Make", command=self.new_fil)
+        self.top5 = Toplevel(self.root)
+        self.new_f_name = Entry(self.top5)
+        confirm = Button(self.top5, text="Make", command=self.new_fil)
         self.new_f_name.bind("<Return>", self.new_fil)
         self.new_f_name.pack()
         confirm.pack()
@@ -252,8 +248,14 @@ class Rev(object):
         if x:
             self.warn(x)
         else:
-            system("open " + str(self.new_f_name.get()))
-        self.topf.destroy()
+            m = Popen("open " + str(self.new_f_name.get()) + "; ls", shell=True, \
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            i, t = m.communicate()
+            if t:
+                self.warn(t)
+            else:
+                self.insert_thing(i)
+        self.top5.destroy()
 
     def new_fol(self, value=None):
         o = subprocess.Popen("mkdir " + str(self.new_name.get()), shell=True, stdout=subprocess.PIPE, \
@@ -306,8 +308,10 @@ class Rev(object):
         self.full = str(path.dirname(path.realpath(self.listbox_thing.get(ACTIVE)))) + "/" + \
             self.listbox_thing.get(ACTIVE)
         if self.full[-5:] == ".app/":
-            i = self.format_full(self.full)
-            system("open " + i)
+            m = subprocess.Popen("open " + self.format_full(self.full), shell=True, stdout=subprocess.PIPE, \
+                stderr=subprocess.PIPE)
+            k, y = m.communicate()
+            self.warn(y) if y else self.insert_thing(k)
         elif path.isdir(self.full):
             chdir(self.full)
             m = subprocess.Popen("ls", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -316,8 +320,11 @@ class Rev(object):
             self.root.wm_title("RevSearch (" + str(path.dirname(path.realpath(self.listbox_thing.get(ACTIVE)))) + ")")
         else:
             self.full = self.listbox_thing.get(ACTIVE)
-            i = self.format_full(self.full)
-            system("open " + i)
+            m = subprocess.Popen("open " + self.format_full(self.full), shell=True, stdout=subprocess.PIPE, \
+                stderr=subprocess.PIPE)
+            k, y = m.communicate()
+            if (y):
+                self.warn(y)
 
 
 if platform() == "Darwin" and __name__ == "__main__":
